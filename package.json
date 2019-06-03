@@ -1,0 +1,42 @@
+{
+  "name": "eth-sync",
+  "version": "0.1.0",
+  "description": "Utility to synchronize transaction data for specific Ethereum applications",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "DEBUG=EthSyncCursor:*,MockWeb3:* mocha --require babel-core/register --require babel-polyfill $(find ./src -name *.test.js)",
+    "prepare": "babel ./src --out-dir ./dist --ignore '**/*.test.js' --source-maps --copy-files",
+    "build": "npm run prepare"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/buidlhub/eth-sync.git"
+  },
+  "author": "BUIDLHub",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/buidlhub/eth-sync/issues"
+  },
+  "homepage": "https://github.com/buidlhub/eth-sync#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.21.0",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-dev-expression": "^0.2.1",
+    "babel-plugin-syntax-dynamic-import": "^6.18.0",
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-plugin-transform-class-properties": "^6.19.0",
+    "babel-plugin-transform-es2015-classes": "^6.18.0",
+    "babel-polyfill": "^6.20.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "eslint": "^5.1.0",
+    "mocha": "^6.1.4"
+  },
+  "dependencies": {
+    "debug": "^4.1.1",
+    "yup": "^0.27.0"
+  }
+}
