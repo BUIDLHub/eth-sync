@@ -11,7 +11,7 @@ Naturally, Infura needs to protect itself against memory and bandwidth overload 
 ## Snapshots 
 Snapshots are a common middleware technique that builds up a running window of cached information in order to speed up initialization. Once the app is bootstrapped with a historical snapshot, the most recent data is retrieved with a much smaller query.
 
-<b><em>eth-sync</em></b> will accept a Snapshot provider that has a "getLatest" asynchronous function to retrieve a snapshot of transaction data appropriate for the app. The format of the returned snapshot must be a newline-delimited file where each line contains a JSON object representing a transaction. The format of the transaction should be similar to what eth-sync provides, which is as follows:
+<b><em>eth-sync</em></b> will accept a Snapshot provider that has a "getLatest" asynchronous function to retrieve a snapshot of transaction data appropriate for the app. The function should return a stream that can be consumed using an "on('data')" callback. The stream should be GZipped and contain newline-delimited data where each line contains a JSON object representing a transaction. The format of the transaction should be similar to what eth-sync provides, which is as follows:
 
 <pre>
 {
