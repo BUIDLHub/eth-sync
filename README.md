@@ -25,4 +25,6 @@ Snapshots are a common middleware technique that builds up a running window of c
 }
 </pre>
 
+The JSON objects contained in a snapshot must be sorted in block, transactionIndex order. Unsorted data will result in eth-sync being unable to bundle events together and will obviously not guarantee correct event callback ordering.
+
 BUIDLHub offers a snapshotting service that will generate and make public snapshots of fully decoded transaction data for your app. See BUIDLHub's eth-sync-snapshot project for an example of how you might use your own snapshotting solution.
