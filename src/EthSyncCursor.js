@@ -162,7 +162,13 @@ export default class EthSyncCursor {
       let obj = data.substring(0, idx);
       let block = JSON.parse(obj);
       block.number -= 0;
-      callback(null, block.transactions);
+      if(this.meta.fromBlock === 0) {
+        this.meta.fromBlock = block.number;
+      }
+      this.meta.toBlock = block.number;
+      callback(null, block.transactions, {
+        ...this.meta
+      });
       if(block.number && block.number > this.fromBlock) {
         this.fromBlock = block.number+1;
       }
@@ -173,7 +179,10 @@ export default class EthSyncCursor {
     if(data.length > 0 && last) {
       let block = JSON.parse(data);
       block.number -= 0;
-      callback(null, block.transactions);
+      this.meta.toBlock = block.number;
+      callback(null, block.transactions, {
+        ...this.meta
+      });
       if(block.number && block.number > this.fromBlock) {
         this.fromBlock = block.number+1;
       }
