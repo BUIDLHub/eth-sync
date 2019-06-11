@@ -13,8 +13,9 @@ let sync = new EthSync({
    snapshotProvider: <optional_snapshot_provider>
 });
 let callback = async (e, txns) => {
-   //txns contain txn receipt metadata along with a logEvents map. The logEvents map is keyed by the event name 
-   //and maps to an array of event objects. Events are identical to what web3 returns for getPastEvents.
+   //txns array contains transactions, each represented as the receipt metadata along with a logEvents map. 
+   //The logEvents map is keyed by the event name and maps to an array of event objects. Event objects are 
+   //the same as web3's getPastEvents.
 }
 sync.start({
    fromBlock: <starting_block>,
