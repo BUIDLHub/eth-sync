@@ -7,7 +7,10 @@ npm i --save eth-sync
 # Usage
 <pre>
 //assume import EthSync from 'eth-sync'
+//assume web3 instance was initialized already 
+
 let sync = new EthSync({
+   web3Factory: ()=>web3, //better to create instance on demand in case web3 goes stale
    address: <contract_address>,
    abi: <contract_abi>,
    snapshotProvider: <optional_snapshot_provider>
