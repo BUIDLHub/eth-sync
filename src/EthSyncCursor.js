@@ -126,7 +126,7 @@ export default class EthSyncCursor {
       var start = Date.now();
 
       let endHandler = async () => {
-        log.debug("Writable stream ending");
+        //log.debug("Writable stream ending");
         //end stream
         if(data.length > 0) {
           try {
@@ -138,12 +138,12 @@ export default class EthSyncCursor {
             callback(e);
           }
         }
-        log.debug("EthSync bootstrapped in",(Date.now()-start),"ms with snapshot containing highest block", this.fromBlock-1);
+        log.info("EthSync bootstrapped in",(Date.now()-start),"ms with snapshot containing highest block", this.fromBlock-1);
         done();
       }
 
       let handleData = async (buff, encoding, cb) => {
-        log.debug("Writable getting buff of length", buff.length);
+        //log.debug("Writable getting buff of length", buff.length);
         if(buff) {
           data += buff.toString();
           try {
@@ -155,7 +155,7 @@ export default class EthSyncCursor {
             }
             callback(e);
           }
-          log.debug("Requesting next buffer of data...");
+          //log.debug("Requesting next buffer of data...");
           cb();
         } else {
           await endHandler();
