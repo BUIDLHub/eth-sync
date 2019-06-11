@@ -1,6 +1,6 @@
 {
   "name": "eth-sync",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Utility to synchronize transaction data for specific Ethereum applications",
   "main": "dist/index.js",
   "scripts": {

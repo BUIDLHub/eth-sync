@@ -117,6 +117,10 @@ export default class EthSyncCursor {
         return err(e);
       }
 
+      if(!stream) {
+        return done();
+      }
+
       var data = "";
 
       let handleData = (buff) => {
