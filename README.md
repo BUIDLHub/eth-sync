@@ -11,20 +11,28 @@ Naturally, Infura needs to protect itself against memory and bandwidth overload 
 ## Snapshots 
 Snapshots are a common middleware technique that builds up a running window of cached information in order to speed up initialization. Once the app is bootstrapped with a historical snapshot, the most recent data is retrieved with a much smaller query.
 
-<b><em>eth-sync</em></b> will accept a Snapshot provider that has a "getLatest" asynchronous function to retrieve a snapshot of transaction data appropriate for the app. The function should return a stream (see <a href="https://www.npmjs.com/package/stream">stream</a>). The stream content should be GZipped and contain newline-delimited data where each line contains a JSON object representing a transaction. The format of the transaction should be similar to what eth-sync provides, which is as follows:
+<b><em>eth-sync</em></b> will accept a Snapshot provider that has a "getLatest" asynchronous function to retrieve a snapshot of transaction data appropriate for the app. The function should return a stream (see NPM <a href="https://www.npmjs.com/package/stream">stream</a>). The stream content should contain newline-delimited data where each line contains a JSON object representing a block. The block does not have to be a full block, but must at least have the block 'number' and 'transactions' fields. At a minimum, it should look like this:
 
 <pre>
 {
-  transactionHash: _hash_,
-  blockNumber: _block_,
-  transactionIndex: _index_,
-  logEvents: {
-     <event-name>: [matching events array]
-  },
-  ...remaining txn metadata mostly matching what web3's getTransactionReceipt returns
+  number: 79123456,
+  transactions: [
+     {
+        transactionHash: "0x1234...",
+        blockNumber: 79123456,
+        transactionIndex: 0,
+        logEvents: {
+           <event-name>: [matching events array]
+        },
+        receipt: {
+            ...metadata matching what web3's getTransactionReceipt
+        }
+     },
+     ...
+  ]
 }
 </pre>
 
-The JSON objects contained in a snapshot must be sorted in block, transactionIndex order. Unsorted data will result in unordered event callbacks.
+The JSON objects contained in a snapshot must be sorted in block order, and each transactions array should be sorted by transaction index. Unsorted data will result in unordered event callbacks. Note that the receipt is optional but recommended if your app needs transaction context with event data.
 
-BUIDLHub offers a snapshotting service that will generate and make public snapshots of fully decoded transaction data for your app. See BUIDLHub's eth-sync-snapshot project for an example of how you might use your own snapshotting solution.
+BUIDLHub offers a snapshotting service that will generate and make public snapshots of fully decoded transaction data for your app. See BUIDLHub's eth-sync-snapshot project for an example of how you might use your own snapshotting solution or to use the BUIDLHub service.
