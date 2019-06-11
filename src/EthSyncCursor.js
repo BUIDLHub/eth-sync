@@ -122,12 +122,12 @@ export default class EthSyncCursor {
       }
 
       var data = "";
-
+      var start = Date.now();
       let handleData = (buff) => {
         if(buff) {
           data += buff.toString();
           try {
-            data = this._processSnapshotItems(callback, data);
+            data = await this._processSnapshotItems(callback, data);
           } catch (e) {
             let idx = data.indexOf(this.recordDelimeter);
             if(idx > 0) {
@@ -140,12 +140,12 @@ export default class EthSyncCursor {
           if(data.length > 0) {
             try {
               //process last bit forcing send since it's last bit of data
-              this._processSnapshotItems(callback, data, true);
+              await this._processSnapshotItems(callback, data, true);
             } catch (e) {
               callback(e);
             }
           }
-          log.debug("EthSync used snapshot with latest block", this.fromBlock-1);
+          log.debug("EthSync bootstrapped in",(Date.now()-start),"ms with snapshot containing highest block", this.fromBlock-1);
           done();
         }
       }
@@ -155,7 +155,7 @@ export default class EthSyncCursor {
     });
   }
 
-  _processSnapshotItems(callback, data, last) {
+  async _processSnapshotItems(callback, data, last) {
     let idx = data.indexOf(this.recordDelimeter);
 
     while(idx > 0) {
@@ -166,7 +166,7 @@ export default class EthSyncCursor {
         this.meta.fromBlock = block.number;
       }
       this.meta.toBlock = block.number;
-      callback(null, block.transactions, {
+      await callback(null, block.transactions, {
         ...this.meta
       });
       if(block.number && block.number > this.fromBlock) {
@@ -180,7 +180,7 @@ export default class EthSyncCursor {
       let block = JSON.parse(data);
       block.number -= 0;
       this.meta.toBlock = block.number;
-      callback(null, block.transactions, {
+      await callback(null, block.transactions, {
         ...this.meta
       });
       if(block.number && block.number > this.fromBlock) {
