@@ -1,6 +1,36 @@
 # eth-sync
 Utility for retrieving contract log events with optional Snapshot provider.
 
+# Installation
+npm i --save eth-sync
+
+# Usage
+<pre>
+//assume import EthSync from 'eth-sync'
+let sync = new EthSync({
+   address: <contract_address>,
+   abi: <contract_abi>,
+   snapshotProvider: <optional_snapshot_provider>
+});
+let callback = async (e, txns) => {
+   //txns array contains transactions, each represented as the receipt metadata along with a logEvents map. 
+   //The logEvents map is keyed by the event name and maps to an array of event objects. Event objects are 
+   //the same as web3's getPastEvents.
+}
+sync.start({
+   fromBlock: <starting_block>,
+   toBlock: <ending_block_inclusive>,
+   eventName: <optional_event_name>,
+   options: <optional_filters_like_web3>
+}, callback)
+.then(()=>{
+   //scan complete. App is now initialized with events from provided block range
+})
+.catch(e=>{
+   //something went wrong in scan.
+});
+</pre>
+
 ## Background
 LogEvents are the most common way to track smart contract state/activity in Ethereum. Using Web3's "getPastEvents" function, apps are able to get all events within a block range. Most apps are using Infura's latest log event indexing mechanism to quickly retrieve their events and initialize their apps. In most cases, this information is then stored locally in the browser's localStorage or using an indexDB solution such as LocalForage or PouchDB. 
 
