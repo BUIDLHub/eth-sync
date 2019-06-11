@@ -185,11 +185,11 @@ export default class EthSyncCursor {
         this.meta.fromBlock = block.number;
       }
       this.meta.toBlock = block.number;
-      log.debug("Calling callback with new block...");
+      //log.debug("Calling callback with new block...");
       await callback(null, block.transactions, {
         ...this.meta
       });
-      log.debug("Callback complete");
+      //log.debug("Callback complete");
       if(block.number && block.number > this.fromBlock) {
         this.fromBlock = block.number+1;
       }
