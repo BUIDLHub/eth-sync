@@ -1,6 +1,7 @@
 import Logger from './Logger';
 import _ from 'lodash';
 import * as yup from 'yup';
+import stream from 'stream';
 
 const log = new Logger({component: "EthSyncCursor"});
 
@@ -110,20 +111,39 @@ export default class EthSyncCursor {
 
   _bootstrap(callback) {
     return new Promise(async (done,err)=>{
-      let stream = null;
+      let s = null;
       try {
-        stream = await this.snapshotProvider.getLatest();
+        s = await this.snapshotProvider.getLatest();
       } catch (e) {
         return err(e);
       }
 
-      if(!stream) {
+      if(!s) {
         return done();
       }
 
       var data = "";
       var start = Date.now();
-      let handleData = (buff) => {
+
+      let endHandler = async () => {
+        log.debug("Writable stream ending");
+        //end stream
+        if(data.length > 0) {
+          try {
+            //process last bit forcing send since it's last bit of data
+            let d = data;
+            data = "";
+            await this._processSnapshotItems(callback, d, true);
+          } catch (e) {
+            callback(e);
+          }
+        }
+        log.debug("EthSync bootstrapped in",(Date.now()-start),"ms with snapshot containing highest block", this.fromBlock-1);
+        done();
+      }
+
+      let handleData = async (buff, encoding, cb) => {
+        log.debug("Writable getting buff of length", buff.length);
         if(buff) {
           data += buff.toString();
           try {
@@ -135,23 +155,22 @@ export default class EthSyncCursor {
             }
             callback(e);
           }
+          log.debug("Requesting next buffer of data...");
+          cb();
         } else {
-          //end stream
-          if(data.length > 0) {
-            try {
-              //process last bit forcing send since it's last bit of data
-              await this._processSnapshotItems(callback, data, true);
-            } catch (e) {
-              callback(e);
-            }
-          }
-          log.debug("EthSync bootstrapped in",(Date.now()-start),"ms with snapshot containing highest block", this.fromBlock-1);
-          done();
+          await endHandler();
         }
-      }
+      };
 
-      stream.on("data", handleData);
-      stream.on("end", handleData);
+      var writeable = new stream.Writable({
+        decodeStrings: false,
+        write: handleData
+      });
+
+      s.pipe(writeable);
+      writeable.on("finish", async ()=>{
+        await endHandler();
+      });
     });
   }
 
@@ -166,9 +185,11 @@ export default class EthSyncCursor {
         this.meta.fromBlock = block.number;
       }
       this.meta.toBlock = block.number;
+      log.debug("Calling callback with new block...");
       await callback(null, block.transactions, {
         ...this.meta
       });
+      log.debug("Callback complete");
       if(block.number && block.number > this.fromBlock) {
         this.fromBlock = block.number+1;
       }
