@@ -11,8 +11,8 @@ npm i --save eth-sync
 
 let sync = new EthSync({
    web3Factory: ()=>web3, //better to create instance on demand in case web3 goes stale
-   address: <contract_address>,
-   abi: <contract_abi>,
+   address: _contract_address_,
+   abi: _contract_abi_,
    snapshotProvider: <optional_snapshot_provider>
 });
 let callback = async (e, txns) => {
@@ -21,10 +21,10 @@ let callback = async (e, txns) => {
    //the same as web3's getPastEvents.
 }
 sync.start({
-   fromBlock: <starting_block>,
-   toBlock: <ending_block_inclusive>,
-   eventName: <optional_event_name>,
-   options: <optional_filters_like_web3>
+   fromBlock: _starting_block_,
+   toBlock: _ending_block_inclusive_,
+   eventName: _optional_event_name_,
+   options: _optional_filters_like_web3_
 }, callback)
 .then(()=>{
    //scan complete. App is now initialized with events from provided block range
