@@ -13,7 +13,7 @@ let sync = new EthSync({
    web3Factory: ()=>web3, //better to create instance on demand in case web3 goes stale
    address: _contract_address_,
    abi: _contract_abi_,
-   snapshotProvider: <optional_snapshot_provider>
+   snapshotProvider: _optional_snapshot_provider_impl_
 });
 let callback = async (e, txns) => {
    //txns array contains transactions, each represented as the receipt metadata along with a logEvents map. 
