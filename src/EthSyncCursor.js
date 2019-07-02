@@ -17,6 +17,8 @@ const schema = yup.object().shape({
   options: yup.object() //not required
 })
 
+const TOO_MANY = /more than \d+ results/;
+
 /**
  * Cursor holds current offset of blocks to retrieve in an iterative way. This
  * allows client code to have control over when to grab next batch of data.
@@ -302,7 +304,7 @@ export default class EthSyncCursor {
 
       //yes, hacky, but Infura docs specific have this as what to look
       //for to adjust block range
-      if(e.message.includes("more than 1000 results")) {
+      if(TOO_MANY.test(e.message)) {
 
         if(span <= 1) {
           //we've already reduced it as much as we can reduce

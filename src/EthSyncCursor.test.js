@@ -82,7 +82,49 @@ describe("EthSyncCursor", ()=>{
     });
     c.init(txnHandler).then(recursivePaging);
   });
+  */
 
+  it("Should pull events from web3", done=>{
+    let web3 = new Web3(RPC_ENDPOINT)
+    let totalReceived = 0;
+    let txnHandler = (err, txns)=>{
+      if(err) {
+        throw err;
+      }
+      txns.forEach(t=>{
+        _.keys(t.logEvents).forEach(k=>{
+          let a = t.logEvents[k];
+          totalReceived += a.length;
+        });
+      });
+    }
+
+    let recursivePaging = cursor => {
+      if(cursor) {
+        cursor.nextBatch(txnHandler).then(recursivePaging);
+      } else if(totalReceived !== blocks.length) {
+        done("Total did not match all events: " + totalReceived + " != " + blocks.length);
+      } else {
+        console.log("Total recieved", totalReceived);
+        done();
+      }
+    }
+    
+    fetchABI()
+    .then(abi=>{
+      
+      let con = new web3.eth.Contract(abi, CONTRACT, {address: CONTRACT});
+      let c = new Cursor({
+        fromBlock: 8054296,
+        toBlock: 8074296,
+        contract: con,
+        web3
+      });
+      return c.init(txnHandler).then(recursivePaging);
+    }).then(()=>console.log("Should be done"));
+  }).timeout(25000)
+
+  /*
   it("Should get all events with snapshots", done=>{
     let blocks = buildBlocks(1001, 1);
     let bootstrapped = blocks.slice(0,300);
@@ -131,6 +173,7 @@ describe("EthSyncCursor", ()=>{
   });
   */
 
+  /*
   it("should pull using BUIDLHub snapshot", done=>{
     let fromBlock = 7932942;
     let snapLastBlock = 7937942;
@@ -183,6 +226,8 @@ describe("EthSyncCursor", ()=>{
     }).then(()=>console.log("Should be done"));
   }).timeout(10000);
 });
+**/
+});
 
 const SNAP_URL = "https://buidlhub-snapshots.s3.amazonaws.com/snap_9NlPQmsBUKbb9uKfcoy2";
 class BHubSnapper {
@@ -201,3 +246,4 @@ class BHubSnapper {
     });
   }
 }
+
