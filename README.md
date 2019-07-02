@@ -11,9 +11,9 @@ npm i --save eth-sync
 
 let sync = new EthSync({
    web3Factory: ()=>web3, //better to create instance on demand in case web3 goes stale
-   address: <contract_address>,
-   abi: <contract_abi>,
-   snapshotProvider: <optional_snapshot_provider>
+   address: _contract_address_,
+   abi: _contract_abi_,
+   snapshotProvider: _optional_snapshot_provider_impl_
 });
 let callback = async (e, txns) => {
    //txns array contains transactions, each represented as the receipt metadata along with a logEvents map. 
@@ -21,10 +21,10 @@ let callback = async (e, txns) => {
    //the same as web3's getPastEvents.
 }
 sync.start({
-   fromBlock: <starting_block>,
-   toBlock: <ending_block_inclusive>,
-   eventName: <optional_event_name>,
-   options: <optional_filters_like_web3>
+   fromBlock: _starting_block_,
+   toBlock: _ending_block_inclusive_,
+   eventName: _optional_event_name_,
+   options: _optional_filters_like_web3_
 }, callback)
 .then(()=>{
    //scan complete. App is now initialized with events from provided block range
