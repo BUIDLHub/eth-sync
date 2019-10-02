@@ -374,7 +374,7 @@ class EthBlock {
   }
 
   get badTransactions() {
-    return this.badTxns;
+    return this._badTxns;
   }
 
   get byHash() {
@@ -387,7 +387,7 @@ class EthBlock {
     let hash = evt.transactionHash;
     if(!hash) {
       log.debug("Invalid event", JSON.stringify(evt, null, 2));
-      this.badTxns.push(evt);
+      this._badTxns.push(evt);
       return;
       //throw new Error("Missing transactionHash in event");
     }

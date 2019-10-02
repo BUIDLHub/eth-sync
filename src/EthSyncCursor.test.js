@@ -174,7 +174,7 @@ describe("EthSyncCursor", ()=>{
   });
   */
 
-  
+  /*
   it("should pull using BUIDLHub snapshot", done=>{
     let fromBlock = 8024408;
     let snapLastBlock = 0;
@@ -227,7 +227,8 @@ describe("EthSyncCursor", ()=>{
     }).then(()=>console.log("Should be done"));
   }).timeout(20000);
 
-
+  */
+ 
 });
 
 
