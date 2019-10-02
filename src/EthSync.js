@@ -29,7 +29,7 @@ export default class EthSync {
     options,
     fromBlock,
     toBlock
-  }, callback) {
+  }, callback, badCallback) {
 
     let web3 = this.web3Factory();
     let con = new web3.eth.Contract(this.abi, this.address, {address: this.address});
@@ -43,6 +43,6 @@ export default class EthSync {
       snapshotProvider: this.snapshotProvider
     });
 
-    return c.init(callback);
+    return c.init(callback, badCallback);
   }
 }

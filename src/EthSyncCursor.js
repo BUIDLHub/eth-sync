@@ -86,18 +86,18 @@ export default class EthSyncCursor {
    * @returns Promise that when complete indicates the query has
    * finished and all events were given through the callback
    */
-  init(callback) {
+  init(callback, badCallback) {
     return new Promise((done,err)=>{
       //first, try to bootstrap with a snapshot provider
       if(this.snapshotProvider) {
         this._bootstrap(callback)
         .then(()=>{
-          this._pull(done, err, callback);
+          this._pull(done, err, callback, badCallback);
         })
         .catch(e=>err(e));
       } else {
         //just pull in according to block range
-        this._pull(done, err, callback);
+        this._pull(done, err, callback, badCallback);
       }
     });
   }
@@ -106,13 +106,13 @@ export default class EthSyncCursor {
    * Get the next batch of items.
    * @returns Promise that when complete indicates query has finished.
    */
-  nextBatch(callback) {
+  nextBatch(callback, badHandler) {
     return new Promise((done,err)=>{
-      this._pull(done, err, callback);
+      this._pull(done, err, callback, badHandler);
     })
   }
 
-  _bootstrap(callback) {
+  _bootstrap(callback, badHandler) {
     return new Promise(async (done,err)=>{
       let s = null;
       try {
@@ -223,7 +223,7 @@ export default class EthSyncCursor {
     return data;
   }
 
-  async _pull(done, err, cb) {
+  async _pull(done, err, cb, badCb) {
     let span = this.toBlock - this.fromBlock;
 
     if(span < 0) {
@@ -250,7 +250,7 @@ export default class EthSyncCursor {
 
       //attempt to get events
       let events = await contract.getPastEvents(evtName, config);
-
+      
       //always make sure events are sorted by block and txn index
       events.sort((a,b)=>{
         let diff = a.blockNumber - b.blockNumber;
@@ -282,7 +282,11 @@ export default class EthSyncCursor {
 
           //send back all transaction bundles
           await cb(null, b.transactions, meta);
+          if(typeof badCb === 'function') {
+            await badCb(b.badTransactions)
+          }
         }
+        
         this.meta = {
           rpcCalls: 0
         }
@@ -359,6 +363,7 @@ class EthBlock {
     this.timestamp = props?props.timestamp:undefined;
 
     this._byHash = {};
+    this._badTxns = [];
     [
       'addEvent'
     ].forEach(fn=>this[fn]=this[fn].bind(this));
@@ -366,6 +371,10 @@ class EthBlock {
 
   get transactions() {
     return _.values(this._byHash);
+  }
+
+  get badTransactions() {
+    return this.badTxns;
   }
 
   get byHash() {
@@ -377,10 +386,12 @@ class EthBlock {
   addEvent(evt) {
     let hash = evt.transactionHash;
     if(!hash) {
-      log.error("Invalid event", JSON.stringify(evt, null, 2));
-      hash = uuid();
+      log.debug("Invalid event", JSON.stringify(evt, null, 2));
+      this.badTxns.push(evt);
+      return;
       //throw new Error("Missing transactionHash in event");
     }
+
     hash = hash.toLowerCase();
     let bundle = this._byHash[hash];
     if(!bundle) {
