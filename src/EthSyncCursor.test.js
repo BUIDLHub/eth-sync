@@ -83,7 +83,7 @@ describe("EthSyncCursor", ()=>{
     c.init(txnHandler).then(recursivePaging);
   });
   */
-
+ /*
   it("Should pull events from web3", done=>{
     let web3 = new Web3(RPC_ENDPOINT)
     let totalReceived = 0;
@@ -123,6 +123,7 @@ describe("EthSyncCursor", ()=>{
       return c.init(txnHandler).then(recursivePaging);
     }).then(()=>console.log("Should be done"));
   }).timeout(25000)
+  */
 
   /*
   it("Should get all events with snapshots", done=>{
@@ -173,11 +174,11 @@ describe("EthSyncCursor", ()=>{
   });
   */
 
-  /*
+  
   it("should pull using BUIDLHub snapshot", done=>{
-    let fromBlock = 7932942;
-    let snapLastBlock = 7937942;
-    let toBlock = 7937955;
+    let fromBlock = 8024408;
+    let snapLastBlock = 0;
+    let toBlock = 8074408;
     let snapper = new BHubSnapper();
     let totalReceived = 0;
     let lastBlock = 0;
@@ -224,10 +225,11 @@ describe("EthSyncCursor", ()=>{
       });
       return c.init(txnHandler).then(recursivePaging);
     }).then(()=>console.log("Should be done"));
-  }).timeout(10000);
+  }).timeout(20000);
+
+
 });
-**/
-});
+
 
 const SNAP_URL = "https://buidlhub-snapshots.s3.amazonaws.com/snap_9NlPQmsBUKbb9uKfcoy2";
 class BHubSnapper {

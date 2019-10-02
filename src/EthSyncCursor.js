@@ -2,6 +2,7 @@ import Logger from './Logger';
 import _ from 'lodash';
 import * as yup from 'yup';
 import stream from 'stream';
+import uuid from 'uuid/v4';
 
 const log = new Logger({component: "EthSyncCursor"});
 
@@ -140,7 +141,7 @@ export default class EthSyncCursor {
             callback(e);
           }
         }
-        log.info("EthSync bootstrapped in",(Date.now()-start),"ms with snapshot containing highest block", this.fromBlock-1);
+        log.info("EthSync bootstrapped", this.snapCount, "txns in", (Date.now()-start), "ms with snapshot containing block range", this.snapStart, "-",this.fromBlock-1);
         done();
       }
 
@@ -195,6 +196,14 @@ export default class EthSyncCursor {
       if(block.number && block.number > this.fromBlock) {
         this.fromBlock = block.number+1;
       }
+      if(block.number && (!this.snapStart || this.snapStart > block.number)) {
+        this.snapStart = block.number;
+      }
+      if(!this.snapCount) {
+        this.snapCount = 0
+      }
+      this.snapCount += block.transactions.length;
+
       data = data.substring(idx+1);
       idx = data.indexOf(this.recordDelimeter);
     }
@@ -368,7 +377,9 @@ class EthBlock {
   addEvent(evt) {
     let hash = evt.transactionHash;
     if(!hash) {
-      throw new Error("Missing transactionHash in event");
+      log.error("Invalid event", JSON.stringify(evt, null, 2));
+      hash = uuid();
+      //throw new Error("Missing transactionHash in event");
     }
     hash = hash.toLowerCase();
     let bundle = this._byHash[hash];
